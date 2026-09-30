@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Work Inspector - ระบบตรวจสอบการใช้ AI ในการทำงาน</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-user-check text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-slate-900 leading-none">AI Work Inspector</h1>
+                    <p class="text-xs text-slate-400 mt-0.5">ระบบประเมินและตรวจสอบร่องรอย AI ในงานส่ง</p>
+                </div>
+            </div>
+            <a href="https://github.com" target="_blank" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg transition font-medium flex items-center gap-2">
+                <i class="fa-brands fa-github text-base"></i> GitHub Repo
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl w-full mx-auto px-6 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Left Input Area -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <!-- Quick Input -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-semibold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-indigo-600"></i> วิเคราะห์เนื้อหาข้อความ
+                </h2>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5">วางเนื้อหาหรืองานเขียนที่ต้องการตรวจสอบ</label>
+                    <textarea id="text-input" rows="6" 
+                        class="w-full p-4 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none leading-relaxed" 
+                        placeholder="วางข้อความภาษาไทย หรือ ภาษาอังกฤษ ที่นี่เพื่อวิเคราะห์หาร่องรอยภาษาของ AI..."></textarea>
+                </div>
+                <div class="flex justify-between items-center pt-1">
+                    <button id="clear-btn" class="text-xs text-slate-400 hover:text-slate-600 transition">
+                        <i class="fa-solid fa-rotate-left"></i> ล้างข้อความ
+                    </button>
+                    <button id="analyze-btn" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs px-5 py-2.5 rounded-xl font-medium shadow-md shadow-indigo-100 transition flex items-center gap-2">
+                        <i class="fa-solid fa-microscope"></i> เริ่มตรวจสอบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Checklist -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-base font-semibold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-600"></i> แบบเช็กพอยต์ประเมินร่องรอย AI (Checklist)
+                </h2>
+                <p class="text-xs text-slate-500">ติ๊กเลือกหัวข้อที่พบในผลงาน เพื่อประเมินความเสี่ยงในการใช้ AI โดยไม่เกลาเนื้อหา</p>
+
+                <div class="space-y-2.5 text-xs">
+                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100/80 transition">
+                        <input type="checkbox" class="chk-item mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+                        <div>
+                            <span class="font-medium text-slate-700">ใช้คำฟุ่มเฟือย/แพทเทิร์น AI</span>
+                            <p class="text-slate-400 text-[11px] mt-0.5">มีคำว่า "โดยสรุปแล้ว", "นอกจากนี้", "สิ่งสำคัญคือ" ซ้ำๆ ทุกย่อหน้า</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100/80 transition">
+                        <input type="checkbox" class="chk-item mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+                        <div>
+                            <span class="font-medium text-slate-700">โครงสร้างย่อหน้าสมบูรณ์แบบเกินไป</span>
+                            <p class="text-slate-400 text-[11px] mt-0.5">แบ่ง 3-4 บรรทัดเท่ากันทุกหัวข้อ มีการใส่ Bullet point ย่อยแบบสำเร็จรูป</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100/80 transition">
+                        <input type="checkbox" class="chk-item mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+                        <div>
+                            <span class="font-medium text-slate-700">ขาดประสบการณ์ตรงหรือบริบทจริง</span>
+                            <p class="text-slate-400 text-[11px] mt-0.5">เนื้อหาเป็นทฤษฎีทั่วไป ไม่มีตัวอย่างเฉพาะเจาะจงของเคสในองค์กร/งานจริง</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100/80 transition">
+                        <input type="checkbox" class="chk-item mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+                        <div>
+                            <span class="font-medium text-slate-700">คำศัพท์แปลกตาหรือการแปลตรงตัว</span>
+                            <p class="text-slate-400 text-[11px] mt-0.5">ใช้สำนวนภาษาอังกฤษที่แปลเป็นไทยแบบทับศัพท์แข็งๆ สำนวนไม่เป็นธรรมชาติ</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Results Area -->
+        <section class="lg:col-span-5 space-y-6">
+
+            <!-- Detection Results Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                <h2 class="text-base font-semibold text-slate-800 border-b border-slate-100 pb-3">
+                    ผลการประเมินโอกาสการใช้ AI
+                </h2>
+
+                <!-- Meter Score -->
+                <div class="text-center py-4">
+                    <div id="score-text" class="text-4xl font-extrabold text-slate-700">0%</div>
+                    <p id="risk-level" class="text-xs font-semibold text-slate-400 mt-1">ยังไม่มีการประเมิน</p>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-100 h-3 rounded-full mt-4 overflow-hidden">
+                        <div id="score-bar" class="bg-indigo-600 h-full w-0 transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <!-- Detected Flags -->
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-xs font-semibold text-slate-700">รายละเอียดสิ่งที่พบ:</h3>
+                    <ul id="flag-list" class="text-xs text-slate-500 space-y-2">
+                        <li class="flex items-center gap-2 text-slate-400">
+                            <i class="fa-regular fa-circle-question"></i> กรอกข้อความหรือติ๊กแบบประเมินเพื่อแสดงผล
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- External Recommended Tools -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                <h3 class="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-indigo-500"></i> เครื่องมือภายนอกแนะนำ (สำหรับตรวจละเอียด)
+                </h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <a href="https://gptzero.me/" target="_blank" class="p-2.5 bg-slate-50 hover:bg-indigo-50 rounded-xl border border-slate-100 hover:border-indigo-200 font-medium text-slate-700 flex items-center justify-between transition">
+                        GPTZero <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    </a>
+                    <a href="https://copyleaks.com/ai-content-detector" target="_blank" class="p-2.5 bg-slate-50 hover:bg-indigo-50 rounded-xl border border-slate-100 hover:border-indigo-200 font-medium text-slate-700 flex items-center justify-between transition">
+                        Copyleaks <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    </a>
+                    <a href="https://zerogpt.com/" target="_blank" class="p-2.5 bg-slate-50 hover:bg-indigo-50 rounded-xl border border-slate-100 hover:border-indigo-200 font-medium text-slate-700 flex items-center justify-between transition">
+                        ZeroGPT <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    </a>
+                    <a href="https://quillbot.com/ai-check" target="_blank" class="p-2.5 bg-slate-50 hover:bg-indigo-50 rounded-xl border border-slate-100 hover:border-indigo-200 font-medium text-slate-700 flex items-center justify-between transition">
+                        QuillBot AI <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-6xl mx-auto px-6 text-center text-xs text-slate-400">
+            Open Source Project • Hosted on GitHub Pages
+        </div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        const textInput = document.getElementById('text-input');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const chkItems = document.querySelectorAll('.chk-item');
+
+        const scoreText = document.getElementById('score-text');
+        const riskLevel = document.getElementById('risk-level');
+        const scoreBar = document.getElementById('score-bar');
+        const flagList = document.getElementById('flag-list');
+
+        // คำแพทเทิร์น AI ภาษาไทย & อังกฤษ
+        const aiKeywords = [
+            "โดยสรุปแล้ว", "นอกจากนี้", "สิ่งสำคัญคือ", "ในยุคดิจิทัล", "มีบทบาทสำคัญ", 
+            "อย่างไรก็ตาม", "เพื่อความเป็นมืออาชีพ", "in conclusion", "furthermore", 
+            "delve", "testament", "crucial role", "moreover", "vital"
+        ];
+
+        // ฟังก์ชันคำนวณคะแนน
+        function calculateRisk() {
+            const text = textInput.value.trim().toLowerCase();
+            let score = 0;
+            let flags = [];
+
+            // 1. ตรวจจากข้อความ
+            if (text.length > 0) {
+                let foundWords = [];
+                aiKeywords.forEach(kw => {
+                    if (text.includes(kw)) {
+                        foundWords.push(kw);
+                    }
+                });
+
+                if (foundWords.length > 0) {
+                    score += Math.min(foundWords.length * 15, 50);
+                    flags.push(`พบคำติดปาก AI (${foundWords.length} คำ): <span class="font-semibold text-slate-700">${foundWords.join(', ')}</span>`);
+                }
+
+                // ตรวจความยาวและความเป็นระเบียบ
+                if (text.length > 300) {
+                    score += 10;
+                    flags.push("ข้อความมีความยาวเพียงพอสำหรับการวิเคราะห์แพทเทิร์น");
+                }
+            }
+
+            // 2. ตรวจจาก Checklist
+            let checkedCount = 0;
+            chkItems.forEach(chk => {
+                if (chk.checked) checkedCount++;
+            });
+
+            if (checkedCount > 0) {
+                score += checkedCount * 12.5; // ติ๊กครบ 4 ข้อได้ 50 คะแนน
+                flags.push(`ตรงกับพฤติกรรมใน Checklist จำนวน ${checkedCount} ข้อ`);
+            }
+
+            // จำกัดคะแนนไม่เกิน 99%
+            score = Math.min(Math.round(score), 99);
+
+            // แสดงผลลัพธ์
+            updateUI(score, flags);
+        }
+
+        function updateUI(score, flags) {
+            scoreText.textContent = `${score}%`;
+            scoreBar.style.width = `${score}%`;
+
+            // เปลี่ยนสีตามระดับความเสี่ยง
+            if (score === 0) {
+                riskLevel.textContent = "ยังไม่พบสัญญาณ AI";
+                riskLevel.className = "text-xs font-semibold text-slate-400 mt-1";
+                scoreBar.className = "bg-slate-300 h-full transition-all duration-500";
+            } else if (score < 35) {
+                riskLevel.textContent = "โอกาสเป็น AI ต่ำ (Low Risk)";
+                riskLevel.className = "text-xs font-semibold text-emerald-600 mt-1";
+                scoreBar.className = "bg-emerald-500 h-full transition-all duration-500";
+            } else if (score < 70) {
+                riskLevel.textContent = "โอกาสเป็น AI ปานกลาง (Medium Risk)";
+                riskLevel.className = "text-xs font-semibold text-amber-600 mt-1";
+                scoreBar.className = "bg-amber-500 h-full transition-all duration-500";
+            } else {
+                riskLevel.textContent = "โอกาสเป็น AI สูงมาก (High Risk)";
+                riskLevel.className = "text-xs font-semibold text-rose-600 mt-1";
+                scoreBar.className = "bg-rose-500 h-full transition-all duration-500";
+            }
+
+            // อัปเดตรายการข้อสังเกต
+            flagList.innerHTML = '';
+            if (flags.length === 0) {
+                flagList.innerHTML = '<li class="text-slate-400"><i class="fa-regular fa-circle-check text-emerald-500"></i> ไม่พบร่องรอยเด่นชัด</li>';
+            } else {
+                flags.forEach(flag => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-start gap-2 text-slate-600";
+                    li.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 shrink-0"></i> <span>${flag}</span>`;
+                    flagList.appendChild(li);
+                });
+            }
+        }
+
+        // Event Listeners
+        analyzeBtn.addEventListener('click', calculateRisk);
+        chkItems.forEach(chk => chk.addEventListener('change', calculateRisk));
+
+        clearBtn.addEventListener('click', () => {
+            textInput.value = '';
+            chkItems.forEach(chk => chk.checked = false);
+            updateUI(0, []);
+        });
+    </script>
+</body>
+</html>
